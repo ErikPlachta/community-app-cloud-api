@@ -8,9 +8,7 @@ const sequelize = require('../config/connection');
 //-- class
 
 // create our Post model
-class Post extends Model {
-
-};
+class Post extends Model {};
 
 
 //------------------------------------------------------------------------------
@@ -52,6 +50,7 @@ Post.init(
       underscored: true,
       modelName: 'post'
     }
+    
   );
 
 
