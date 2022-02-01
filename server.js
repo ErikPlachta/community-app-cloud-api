@@ -30,5 +30,5 @@ app.use(routes);
 sequelize.sync({ force: false }).then(() => {
 //-- Overvwrite existing tables if exist, start connection to express and SQL
 // sequelize.sync({ force: true }).then(() => {
-  app.listen(PORT, () => console.log('Now listening'));
+  app.listen(PORT, () => console.log(`Now listening on http://127.0.0.1:${PORT}`));
 });
