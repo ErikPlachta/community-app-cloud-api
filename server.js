@@ -1,8 +1,9 @@
 //-- access to stylesheet within express app
 const path = require('path');
+
 //-- Express
 const express = require('express');
-const routes = require('./routes');
+const routes = require('./controllers/');
 const sequelize = require('./config/connection');
 
 const app = express();
@@ -16,6 +17,15 @@ app.use(express.urlencoded({ extended: true }));
 
 //-- this MUST be above routes
 app.use(express.static(path.join(__dirname, 'public')));
+
+
+//-- Defining APP template engine - Using Handelbars
+const exphbs = require('express-handlebars');
+const hbs = exphbs.create({});
+
+app.engine('handlebars', hbs.engine);
+app.set('view engine', 'handlebars');
+
 
 // turn on routes
 app.use(routes);
