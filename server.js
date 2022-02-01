@@ -1,3 +1,5 @@
+//-- access to stylesheet within express app
+const path = require('path');
 //-- Express
 const express = require('express');
 const routes = require('./routes');
@@ -6,8 +8,14 @@ const sequelize = require('./config/connection');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+
+//-- Feeding Express server info it needs to be used
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+//-- this MUST be above routes
+app.use(express.static(path.join(__dirname, 'public')));
 
 // turn on routes
 app.use(routes);
