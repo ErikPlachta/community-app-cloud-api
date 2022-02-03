@@ -39,6 +39,7 @@ const router = require('express').Router();
 
 //-- More complex routing to homepage
 router.get('/', (req, res) => {
+
     Post.findAll({
         attributes: [
         'id',
@@ -62,7 +63,7 @@ router.get('/', (req, res) => {
         }
         ]
     })
-        .then(dbPostData => {
+    .then(dbPostData => {
         //-- testing to verify payload
         // console.log(dbPostData[0]);
         // pass a single post object into the homepage template
@@ -76,14 +77,25 @@ router.get('/', (req, res) => {
         //-- updating page with content from post
             /*NOTE: homepage.handlebars has a dynamic loop built in to render all*/
         res.render('homepage', { posts });
-        })
-        .catch(err => {
+        console.log(req.session);
+    })
+    .catch(err => {
         console.log(err);
         res.status(500).json(err);
-        });
+    });
 });
-  
+
+
+
 router.get('/login', (req, res) => {
+    //-- check for a session and redirect to the homepage 
+    //-- IE if cookies show active session, don't require login again already logged in.
+    if (req.session.loggedIn) {
+        res.redirect('/');
+        return;
+      }
+    
+
     res.render('login');
 });
 

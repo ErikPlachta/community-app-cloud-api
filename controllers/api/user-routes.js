@@ -77,7 +77,18 @@ router.post('/', (req, res) => {
       email: req.body.email,
       password: req.body.password
     })
-      .then(dbUserData => res.json(dbUserData))
+      //-- Accessing user data from db
+      // .then(dbUserData => res.json(dbUserData))
+      //-- accessing the session information and user data from db
+      .then(dbUserData => {
+        req.session.save(() => {
+          req.session.user_id = dbUserData.id;
+          req.session.username = dbUserData.username;
+          req.session.loggedIn = true;
+      
+          res.json(dbUserData);
+        });
+      })
       .catch(err => {
         console.log(err);
         res.status(500).json(err);
@@ -111,33 +122,62 @@ router.post('/login', (req, res) => {
     })
     //-- then user verification client management
     .then(dbUserData => {
-        if (!dbUserData) {
-            res.status(400).json({ message: 'No user with that email address!' });
-            return;
-        }
-        // Otherwise, verify password matches user database
+      if (!dbUserData) {
+          res.status(400).json({ message: 'No user with that email address!' });
+          return;
+      }
+      // Otherwise, verify password matches user database
 
-        // -- send back user payload with hash'd pass in db ( testing )
-        // res.json({ user: dbUserData });
+      // -- send back user payload with hash'd pass in db ( testing )
+      // res.json({ user: dbUserData });
 
-        //-- verify password
-        /* confirm if provided password matches, by taking EU input, hashing,
-            matching to db, and then returning boolean.
-        */
-       
-            //-- is password a match to user?
-        const validPassword = dbUserData.checkPassword(req.body.password);
-        
-        //-- if not, exit
-        if (!validPassword) {
-            res.status(400).json({ message: 'Incorrect password!' });
-            return;
-        }
+      //-- verify password
+      /* confirm if provided password matches, by taking EU input, hashing,
+          matching to db, and then returning boolean.
+      */
+      
+      //-- is password a match to user?
+      const validPassword = dbUserData.checkPassword(req.body.password);
+      
+      //-- if not, exit
+      if (!validPassword) {
+          res.status(400).json({ message: 'Incorrect password!' });
+          return;
+      }
+
+      /* 
+        This code sets up an Express.js session and connects the session to our
+          Sequelize database.
+      */
+      req.session.save(() => {
+        // declare session variables
+        req.session.user_id = dbUserData.id;
+        req.session.username = dbUserData.username;
+        req.session.loggedIn = true;
+  
         //-- otherwise, confirm logged in and return paylod for awareness too.
         res.json({ user: dbUserData, message: 'You are now logged in!' });
-
+      });
     });
-})
+});
+
+//-- Logging out - (destroying the session variables and resetting the cookie.)
+router.post('/logout', (req, res) => {
+  
+  if (req.session.loggedIn) {
+    
+    //-- destroy session variables
+    req.session.destroy(() => {
+      //-- once logged out, let client know request was successful
+      res.status(204).end();
+    });
+  }
+  else {
+    res.status(404).end();
+  }
+});
+
+
   
 
 // PUT /api/users/1
