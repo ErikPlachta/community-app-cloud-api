@@ -40,29 +40,29 @@ const router = require('express').Router();
 //-- More complex routing to homepage
 router.get('/', (req, res) => {
     Post.findAll({
-      attributes: [
+        attributes: [
         'id',
         'post_url',
         'title',
         'created_at',
         [sequelize.literal('(SELECT COUNT(*) FROM vote WHERE post.id = vote.post_id)'), 'vote_count']
-      ],
-      include: [
+        ],
+        include: [
         {
-          model: Comment,
-          attributes: ['id', 'comment_text', 'post_id', 'user_id', 'created_at'],
-          include: {
+            model: Comment,
+            attributes: ['id', 'comment_text', 'post_id', 'user_id', 'created_at'],
+            include: {
             model: User,
             attributes: ['username']
-          }
+            }
         },
         {
-          model: User,
-          attributes: ['username']
+            model: User,
+            attributes: ['username']
         }
-      ]
+        ]
     })
-      .then(dbPostData => {
+        .then(dbPostData => {
         //-- testing to verify payload
         // console.log(dbPostData[0]);
         // pass a single post object into the homepage template
@@ -76,13 +76,15 @@ router.get('/', (req, res) => {
         //-- updating page with content from post
             /*NOTE: homepage.handlebars has a dynamic loop built in to render all*/
         res.render('homepage', { posts });
-      })
-      .catch(err => {
+        })
+        .catch(err => {
         console.log(err);
         res.status(500).json(err);
-      });
-  });
+        });
+});
   
-  
+router.get('/login', (req, res) => {
+    res.render('login');
+});
 
 module.exports = router;
